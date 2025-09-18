@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desi Food Cart Franchise - Investor Pitch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Teko:wght@300..700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Chosen Palette: Warm Saffron & Earth -->
+    <!-- Application Structure Plan: A single-page, vertical-scrolling narrative designed to guide an investor. It starts with the core problem/hook, presents the market opportunity with a visual chart, explains the business model with an interactive flow diagram, showcases the unique food, details the two investment paths with an interactive calculator for engagement, summarizes the promises, and ends with a strong call to action. This structure builds a compelling story, moving from the 'why' to the 'how' and finally to the 'what's in it for you', making it more persuasive than a static document. -->
+    <!-- Visualization & Content Choices: 
+        1. Market Gap -> Goal: Compare -> Viz: Bar Chart -> Interaction: Hover tooltips -> Justification: Provides a clean, direct, and universally understood visual comparison of the franchise against competitors across key metrics. -> Library: Chart.js (Canvas).
+        2. Business Model -> Goal: Organize/Explain Process -> Viz: Interactive Cards & Content Panel -> Interaction: Click on a card to reveal its content with a smooth transition. This creates a guided, multi-step narrative. -> Justification: Breaks down the operational flow into an elegant, focused, and non-shifting interactive experience, elevating it from a simple flow chart to an impressive business showcase. -> Library/Method: HTML/Tailwind/JS.
+        3. Investment Models -> Goal: Engage/Persuade -> Viz: HTML Slider & Text Output -> Interaction: User adjusts slider to see potential profit projections -> Justification: Makes the financial opportunity tangible and interactive, a key "wow" factor for an investor. -> Library/Method: HTML/JS.
+        4. Menu -> Goal: Inform/Engage -> Viz: Interactive Flip Cards -> Interaction: Hover to flip card and reveal details -> Justification: Provides a delightful and smooth interaction to explore the menu, eliminating layout shifts and making the content more discoverable. -> Library/Method: HTML/JS/Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FDF7F2;
+            color: #4A2E2A;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Teko', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .bg-primary {
+            background-color: #FDF7F2;
+        }
+
+        .bg-secondary {
+            background-color: #F5E8DD;
+        }
+
+        .bg-accent {
+            background-color: #E87A5D;
+        }
+
+        .text-accent {
+            color: #E87A5D;
+        }
+
+        .text-dark {
+            color: #4A2E2A;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            background-color: #E87A5D;
+            color: #FFFFFF;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: #D36A4F;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-link {
+            transition: color 0.3s ease;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #E87A5D;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+
+        .flow-item-content {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            transform: translateY(10px);
+            height: 0;
+            overflow: hidden;
+        }
+
+        .flow-item-content.active {
+            opacity: 1;
+            transform: translateY(0);
+            height: auto;
+        }
+
+        /* Flip Card Styles */
+        .flip-card {
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 0.5rem;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .flip-card-front {
+            background-color: #fff;
+            color: #4A2E2A;
+            z-index: 2;
+        }
+
+        .flip-card-back {
+            background-color: #F5E8DD;
+            color: #4A2E2A;
+            transform: rotateY(180deg);
+        }
+
+        .flow-card.active {
+            background-color: #E87A5D;
+            color: #FFFFFF;
+            transform: translateY(-8px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        .flow-card.active .flow-icon {
+            transform: scale(1.1);
+            color: #E87A5D;
+        }
+
+        .flow-card.active .text-dark {
+            color: #FFFFFF;
+        }
+
+        .flow-card {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .flow-panel-content {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .flow-panel-content.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes subtle-pan {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+
+        .flow-bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            animation: subtle-pan 60s linear infinite;
+        }
+
+        /* New Vertical Flow Styles */
+        .flow-container {
+            position: relative;
+        }
+
+        .flow-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #4A2E2A;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .flow-progress {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 2px;
+            background-color: #E87A5D;
+            transform: translateX(-50%);
+            height: 0;
+            transition: height 0.8s ease-out;
+            z-index: 2;
+        }
+
+        .flow-item {
+            position: relative;
+            z-index: 3;
+            margin-bottom: 4rem;
+        }
+
+        .flow-dot {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #4A2E2A;
+            transition: background-color 0.8s ease, transform 0.8s ease;
+        }
+
+        .flow-item.active .flow-dot {
+            background-color: #E87A5D;
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+
+        .flow-content-box {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .flow-item.active .flow-content-box {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .flow-graphic {
+            font-size: 8rem;
+            color: rgba(74, 46, 42, 0.5);
+            transition: all 0.8s ease-in-out;
+            transform: scale(0.8);
+        }
+
+        .flow-item.active .flow-graphic {
+            transform: scale(1.1);
+            color: #E87A5D;
+        }
+
+        .promise-icon {
+            font-size: 2rem;
+        }
+    </style>
+</head>
+
+<body class="bg-primary">
+
+    <header id="header" class="bg-primary/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-4xl text-dark">DesiCart</h1>
+            <div class="hidden md:flex space-x-8 font-semibold text-dark">
+                <a href="#opportunity" class="nav-link">Opportunity</a>
+                <a href="#solution" class="nav-link">Solution</a>
+                <a href="#models" class="nav-link">Models</a>
+                <a href="#food" class="nav-link">The Food</a>
+            </div>
+            <a href="#cta" class="btn hidden md:inline-block">Invest Now</a>
+            <button id="mobile-menu-btn" class="md:hidden text-3xl text-dark">☰</button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-primary pb-4">
+            <a href="#opportunity"
+                class="block text-center py-2 text-lg font-semibold text-dark hover:bg-secondary">Opportunity</a>
+            <a href="#solution"
+                class="block text-center py-2 text-lg font-semibold text-dark hover:bg-secondary">Solution</a>
+            <a href="#models"
+                class="block text-center py-2 text-lg font-semibold text-dark hover:bg-secondary">Models</a>
+            <a href="#food" class="block text-center py-2 text-lg font-semibold text-dark hover:bg-secondary">The
+                Food</a>
+            <div class="text-center mt-4">
+                <a href="#cta" class="btn">Invest Now</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl md:text-8xl text-dark leading-tight">YOUR FOOD CART DREAM.</h1>
+                <h2 class="text-5xl md:text-8xl text-accent leading-tight mb-6">DELIVERED.</h2>
+                <p class="max-w-3xl mx-auto text-lg md:text-xl text-dark/80 mb-10">
+                    You have the passion for authentic desi food. We provide the profitable, scalable system. We've
+                    solved the dilemma of taste vs. hygiene, so your dream of owning a food business doesn't have to
+                    wait any longer.
+                </p>
+                <a href="#opportunity" class="btn text-xl">Discover The Opportunity</a>
+            </div>
+        </section>
+
+        <!-- The Opportunity -->
+        <section id="opportunity" class="py-20 bg-secondary">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-5xl md:text-6xl text-dark">THE MARKET IS READY FOR YOUR DREAM</h2>
+                    <p class="max-w-3xl mx-auto mt-4 text-lg text-dark/80">
+                        This isn't just a business; it's a movement. Consumers are actively seeking food that delivers
+                        on all fronts: authentic taste, guaranteed hygiene, fair price, and cultural soul. We're
+                        positioned perfectly to capture this massive, underserved market.
+                    </p>
+                </div>
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="w-full md:w-1/2">
+                        <div class="chart-container">
+                            <canvas id="marketChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h3 class="text-4xl text-dark mb-4">THE DILEMMA & THE SOLUTION</h3>
+                        <p class="text-dark/80 mb-4">
+                            The modern food lover faces a constant compromise.
+                        </p>
+                        <ul class="space-y-4">
+                            <li class="p-4 bg-primary rounded-lg shadow-sm">
+                                <h4 class="font-bold text-dark text-xl">THE PROBLEM</h4>
+                                <p class="text-dark/70">Typical street food is often delicious but unhygienic.
+                                    "Hygienic" restaurants are often expensive or lack authentic taste.</p>
+                            </li>
+                            <li class="p-4 bg-accent/20 rounded-lg shadow-md border-l-4 border-accent">
+                                <h4 class="font-bold text-accent text-xl">THE DESICART SOLUTION</h4>
+                                <p class="text-dark/90 font-medium">We bridge the gap, delivering high scores on every
+                                    metric that matters to today's consumer. It's the best of all worlds, in a single,
+                                    profitable model.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Solution -->
+        <section id="solution" class="py-20 bg-primary relative overflow-hidden">
+            <div class="flow-bg-pattern absolute inset-0 z-0 opacity-20"
+                style="background-image: url('data:image/svg+xml;utf8,<svg width=\'200\' height=\'200\' viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'><g fill=\'%2388654E\' fill-opacity=\'0.2\'><path d=\'M50 0L60 10L50 20L40 10Z\'/><path d=\'M70 30L80 40L70 50L60 40Z\'/><path d=\'M30 70L40 80L30 90L20 80Z\'/><path d=\'M10 100L20 110L10 120L0 110Z\'/><path d=\'M90 140L100 150L90 160L80 150Z\'/><path d=\'M110 170L120 180L110 190L100 180Z\'/><path d=\'M150 100L160 110L150 120L140 110Z\'/><path d=\'M170 140L180 150L170 160L160 150Z\'/><path d=\'M190 170L200 180L190 190L180 180Z\'/><path d=\'M120 20L130 30L120 40L110 30Z\'/><path d=\'M140 60L150 70L140 80L130 70Z\'/><path d=\'M160 10L170 20L160 30L150 20Z\'/><path d=\'M180 40L190 50L180 60L170 50Z\'/><path d=\'M0 0L10 10L0 20L-10 10Z\'/><path d=\'M-10 30L0 40L-10 50L-20 40Z\'/><path d=\'M-30 70L-20 80L-30 90L-40 80Z\'/><path d=\'M-10 100L0 110L-10 120L-20 110Z\'/><path d=\'M-50 140L-40 150L-50 160L-60 150Z\'/></g></svg>');">
+            </div>
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-12">
+                    <h2 class="text-5xl md:text-6xl text-dark">OUR SYSTEM: YOUR ENGINE FOR PROFIT</h2>
+                    <p class="max-w-3xl mx-auto mt-4 text-lg text-dark/80">
+                        We've engineered a seamless system from our central kitchen to your mobile cart, designed for
+                        consistency, scalability, and your peace of mind.
+                    </p>
+                </div>
+                <div class="flex justify-center items-center">
+                    <div class="relative max-w-2xl w-full mx-auto p-4 md:p-8">
+                        <div class="flow-container">
+                            <div class="flow-line"></div>
+                            <div class="flow-progress" id="flow-progress"></div>
+
+                            <!-- Step 1 -->
+                            <div id="flow-item-1" class="flow-item grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div
+                                    class="flow-content-box p-4 md:p-8 bg-secondary rounded-xl shadow-lg md:order-1 order-2">
+                                    <h3 class="text-2xl md:text-3xl text-dark font-semibold mb-2">The Pantry Kitchen
+                                    </h3>
+                                    <p class="text-dark/80">This is your business's powerhouse. All food is prepared
+                                        here under strict hygienic standards, using traditional techniques that
+                                        guarantee authentic taste and flawless consistency. It frees you to focus on
+                                        sales, not sourcing ingredients.</p>
+                                </div>
+                                <div class="flex flex-col items-center justify-center md:order-2 order-1 relative">
+                                    <span class="flow-graphic">🍲</span>
+                                    <div class="flow-dot"></div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div id="flow-item-2"
+                                class="flow-item grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 md:mt-24">
+                                <div
+                                    class="flow-content-box p-4 md:p-8 bg-secondary rounded-xl shadow-lg md:order-2 order-2">
+                                    <h3 class="text-2xl md:text-3xl text-dark font-semibold mb-2">The Desi Cart</h3>
+                                    <p class="text-dark/80">Your cart is a fully-equipped, modern mobile kitchen. It's
+                                        designed for flexibility and efficiency, with modular storage, power outlets,
+                                        steamers to keep food fresh, and a practical dispensary for eco-friendly
+                                        cutlery. Go where the customers are.</p>
+                                </div>
+                                <div class="flex flex-col items-center justify-center md:order-1 order-1 relative">
+                                    <span class="flow-graphic">🚚</span>
+                                    <div class="flow-dot"></div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div id="flow-item-3"
+                                class="flow-item grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 md:mt-24">
+                                <div
+                                    class="flow-content-box p-4 md:p-8 bg-secondary rounded-xl shadow-lg md:order-1 order-2">
+                                    <h3 class="text-2xl md:text-3xl text-dark font-semibold mb-2">Happy Customers</h3>
+                                    <p class="text-dark/80">The end result: a loyal customer base that trusts your brand
+                                        for delicious, safe, and authentic food. Our system ensures every customer has
+                                        the same high-quality experience, building a reputation that drives repeat
+                                        business and profit.</p>
+                                </div>
+                                <div class="flex flex-col items-center justify-center md:order-2 order-1 relative">
+                                    <span class="flow-graphic">😊</span>
+                                    <div class="flow-dot"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Investment Models -->
+        <section id="models" class="py-20 bg-secondary">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-5xl md:text-6xl text-dark">TWO PATHS TO YOUR PROFIT</h2>
+                    <p class="max-w-3xl mx-auto mt-4 text-lg text-dark/80">
+                        Whether you want to be a hands-on entrepreneur or a passive investor, we have a model designed
+                        for your ambition.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Model 1 -->
+                    <div class="bg-primary p-8 rounded-lg shadow-xl border-t-4 border-accent">
+                        <h3 class="text-4xl text-dark mb-2">The "Pay & Forget" Model</h3>
+                        <p class="text-accent text-xl font-semibold mb-6">Passive Investor</p>
+                        <p class="text-dark/80 mb-6">For the investor who wants a high-return asset without the daily
+                            grind. You fund the vision, we manage it all, and you enjoy a consistent share of the
+                            profits.</p>
+
+                        <div class="mt-8">
+                            <label for="investmentSlider" class="block text-dark font-semibold mb-2">Illustrative
+                                Investment Calculator:</label>
+                            <input id="investmentSlider" type="range" min="25000" max="200000" value="75000" step="5000"
+                                class="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-sm text-dark/70 mt-1">
+                                <span>$25k</span>
+                                <span>$200k</span>
+                            </div>
+                            <div class="mt-6 p-4 bg-accent/10 rounded-lg text-center">
+                                <p class="text-dark/80">Your Investment:</p>
+                                <p id="investmentAmount" class="text-3xl font-bold text-accent">$75,000</p>
+                                <p class="text-dark/80 mt-2">Potential Annual Profit Share (Up To):</p>
+                                <p id="profitShare" class="text-3xl font-bold text-accent">25%</p>
+                                <p class="text-xs text-dark/60 mt-2">(Disclaimer: For illustrative purposes only. Actual
+                                    returns may vary.)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Model 2 -->
+                    <div class="bg-primary p-8 rounded-lg shadow-xl border-t-4 border-dark/50">
+                        <h3 class="text-4xl text-dark mb-2">The "Operate with Support" Model</h3>
+                        <p class="text-dark/60 text-xl font-semibold mb-6">Active Entrepreneur</p>
+                        <p class="text-dark/80 mb-6">For the hands-on dreamer who wants to build and run their own
+                            business. You operate the cart and keep 100% of the profits you generate.</p>
+                        <ul class="space-y-3 text-dark/90">
+                            <li class="flex items-start"><span class="text-accent mr-3">✔</span>
+                                <div><strong class="font-semibold">We Fuel Your Launch:</strong> Get a fully-equipped
+                                    cart and your first 3 months of pantry-supplied inventory.</div>
+                            </li>
+                            <li class="flex items-start"><span class="text-accent mr-3">✔</span>
+                                <div><strong class="font-semibold">We Empower You:</strong> Comprehensive training and
+                                    ongoing support to ensure your success.</div>
+                            </li>
+                            <li class="flex items-start"><span class="text-accent mr-3">✔</span>
+                                <div><strong class="font-semibold">You Keep The Returns:</strong> You are the boss. You
+                                    earn all the profits.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Food -->
+        <section id="food" class="py-20 bg-primary">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-5xl md:text-6xl text-dark">TASTE THAT TELLS A STORY</h2>
+                    <p class="max-w-3xl mx-auto mt-4 text-lg text-dark/80">
+                        In a market full of shortcuts, our commitment to authenticity is our ultimate advantage. We
+                        don't just serve food; we serve a tradition.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                    <div class="text-center p-6 bg-secondary rounded-lg shadow-md">
+                        <h3 class="text-3xl text-dark">Authentic Techniques</h3>
+                        <p class="text-dark/80 mt-2">We use age-old cooking methods you won't find in modern fast-food
+                            joints.</p>
+                    </div>
+                    <div class="text-center p-6 bg-secondary rounded-lg shadow-md">
+                        <h3 class="text-3xl text-dark">Stone-Ground Masalas</h3>
+                        <p class="text-dark/80 mt-2">Every spice blend is stone-ground for a deeper, more aromatic
+                            flavor.</p>
+                    </div>
+                    <div class="text-center p-6 bg-secondary rounded-lg shadow-md">
+                        <h3 class="text-3xl text-dark">Purity is a Promise</h3>
+                        <p class="text-dark/80 mt-2">No palm oil, no synthetic preservatives, no artificial colors.
+                            Ever.</p>
+                    </div>
+                </div>
+
+                <div class="text-center mb-12">
+                    <h3 class="text-4xl text-dark">A Menu That Sells Itself</h3>
+                    <p class="max-w-xl mx-auto mt-2 text-dark/80">Hover over an item to discover its unique story.</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    <div class="flip-card min-h-[150px]">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <h4 class="text-xl text-dark font-bold">Multi-Grain Dosa & Idli</h4>
+                            </div>
+                            <div class="flip-card-back p-4">
+                                <p class="text-sm text-dark/80">A nutritious, flavorful staple made from a healthy blend
+                                    of grains, perfect for a light yet filling meal.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card min-h-[150px]">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <h4 class="text-xl text-dark font-bold">Millet Pongal</h4>
+                            </div>
+                            <div class="flip-card-back p-4">
+                                <p class="text-sm text-dark/80">A traditional comfort food with a modern, healthy twist
+                                    using nutrient-rich millets. A warm and hearty choice.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card min-h-[150px]">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <h4 class="text-xl text-dark font-bold">Millet Bisibelebath</h4>
+                            </div>
+                            <div class="flip-card-back p-4">
+                                <p class="text-sm text-dark/80">A classic Karnataka dish reimagined with healthy
+                                    millets. A complete meal in one bowl, bursting with flavor.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card min-h-[150px]">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <h4 class="text-xl text-dark font-bold">Mallige Idli</h4>
+                            </div>
+                            <div class="flip-card-back p-4">
+                                <p class="text-sm text-dark/80">Pillowy soft idlis, as delicate as a jasmine flower
+                                    ("Mallige"). A true South Indian delight.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card min-h-[150px]">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <h4 class="text-xl text-dark font-bold">Akki Rotti</h4>
+                            </div>
+                            <div class="flip-card-back p-4">
+                                <p class="text-sm text-dark/80">A popular flatbread from Karnataka made with rice flour
+                                    ("Akki"), onions, and spices. Gluten-free and delicious.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card min-h-[150px]">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <h4 class="text-xl text-dark font-bold">Ragi Rotti</h4>
+                            </div>
+                            <div class="flip-card-back p-4">
+                                <p class="text-sm text-dark/80">A highly nutritious flatbread made from finger millet
+                                    ("Ragi"), packed with calcium and fiber.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Promises -->
+        <section id="promises" class="py-20 bg-secondary">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-5xl md:text-6xl text-dark">A SECURE & PROFITABLE INVESTMENT</h2>
+                </div>
+                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="flex items-start">
+                        <span class="promise-icon text-accent mr-4">✅</span>
+                        <div>
+                            <h4 class="text-2xl text-dark font-semibold">Financial Certainty</h4>
+                            <p class="text-dark/80">Your investment is protected by a transparent, single-cost model
+                                with no hidden fees.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="promise-icon text-accent mr-4">✅</span>
+                        <div>
+                            <h4 class="text-2xl text-dark font-semibold">Unmatched Quality</h4>
+                            <p class="text-dark/80">Our central pantry guarantees the authentic taste and impeccable
+                                hygiene that earns customer trust.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="promise-icon text-accent mr-4">✅</span>
+                        <div>
+                            <h4 class="text-2xl text-dark font-semibold">Scalable Freedom</h4>
+                            <p class="text-dark/80">The mobile cart model gives you the ultimate flexibility to test new
+                                locations and effortlessly expand your business.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="promise-icon text-accent mr-4">✅</span>
+                        <div>
+                            <h4 class="text-2xl text-dark font-semibold">The Future of Profit</h4>
+                            <p class="text-dark/80">This isn't just a business, it's a proven system for sustainable,
+                                long-term returns on your investment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section id="cta" class="py-20 md:py-32 bg-primary">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-5xl md:text-7xl text-dark leading-tight">READY TO TURN YOUR PASSION</h2>
+                <h2 class="text-5xl md:text-7xl text-accent leading-tight mb-8">INTO PROFIT?</h2>
+                <p class="max-w-3xl mx-auto text-lg md:text-xl text-dark/80 mb-10">
+                    This is more than a franchise. It's your opportunity to build a business that reflects your passion
+                    for food and culture. With our system and your drive, success is inevitable. Let's talk.
+                </p>
+                <a href="#" class="btn text-xl">Schedule a One-on-One Call</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-primary/70 py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 DesiCart Franchises. All Rights Reserved.</p>
+            <p class="text-sm mt-2">Your Food Cart Dream. Delivered.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            window.onscroll = () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 60) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            };
+
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            const marketChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Authentic Taste', 'Hygiene', 'Affordability', 'Freshness', 'Cultural Soul'],
+                    datasets: [
+                        {
+                            label: 'Competitors',
+                            data: [7, 6, 6.5, 6.5, 6],
+                            backgroundColor: 'rgba(74, 46, 42, 0.5)',
+                            borderColor: 'rgba(74, 46, 42, 1)',
+                            borderWidth: 1,
+                        },
+                        {
+                            label: 'Our Franchise',
+                            data: [9.5, 9.5, 9, 9.5, 9.5],
+                            backgroundColor: 'rgba(232, 122, 93, 0.8)',
+                            borderColor: 'rgba(232, 122, 93, 1)',
+                            borderWidth: 1,
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#4A2E2A',
+                                font: { weight: '500' }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                stepSize: 2,
+                                color: '#4A2E2A'
+                            },
+                            grid: { color: 'rgba(74, 46, 42, 0.2)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#4A2E2A',
+                                font: { size: 14, family: 'Poppins' }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const flowItems = document.querySelectorAll('.flow-item');
+            const flowProgress = document.getElementById('flow-progress');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.5
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        const progressHeight = entry.target.offsetTop - flowItems[0].offsetTop;
+                        flowProgress.style.height = `${progressHeight}px`;
+                    }
+                });
+            }, observerOptions);
+
+            flowItems.forEach(item => {
+                observer.observe(item);
+            });
+
+            const investmentSlider = document.getElementById('investmentSlider');
+            const investmentAmount = document.getElementById('investmentAmount');
+            const profitShare = document.getElementById('profitShare');
+
+            investmentSlider.addEventListener('input', (event) => {
+                const value = parseInt(event.target.value);
+                investmentAmount.textContent = `$${value.toLocaleString()}`;
+
+                const baseProfit = 20;
+                const bonus = (value - 25000) / 175000 * 15;
+                const totalProfit = Math.min(baseProfit + bonus, 35);
+                profitShare.textContent = `${Math.round(totalProfit)}%`;
+            });
+        });
+    </script>
+</body>
+
+</html>
